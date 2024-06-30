@@ -55,7 +55,7 @@
               </div>
               <div class="form-group mb-3">
                 <label for="hours">Horas Trabalhadas por Mês</label>
-                <input type="text" class="form-control" id="hours" required>
+                <input type="text" class="form-control" id="hours" required placeholder="Média horas dia * Qtde. dias">
               </div>
               <div class="form-group mb-3">
                 <label for="productPrice">Valor do Produto (R$)</label>
@@ -65,9 +65,12 @@
               <button type="reset" class="btn btn-secondary">Limpar</button>
             </form>
             <div class="result mt-4 alert alert-info animate__animated" id="result">
-              Você precisará trabalhar <span id="workHours"></span> horas, o que equivale a <span id="workDays"></span> dias, para adquirir este produto.
+              Você precisará trabalhar <span id="workHours"></span> horas, o que equivale a <span id="workDays"></span> dias <b>inteiros (de 24 horas)</b>, para adquirir este produto.
             </div>
           </div>
+        </div>
+        <div class="alert alert-primary mt-2">
+          <b>Observação:</b> Este cálculo é uma estimativa e não leva em consideração descontos, impostos e outros fatores que podem influenciar no resultado final. Os valores apresentados podem ser aproximados.
         </div>
       </div>
     </div>
@@ -105,6 +108,8 @@
       
       // Aplicar máscara monetária
       $('#salary, #productPrice').mask('000.000.000.000.000,00', {reverse: true});
+      $('#salary, #productPrice').attr('placeholder', 'R$ 0,00'); // Placeholder
+
       // Aplicar máscara numérica
       $('input#hours').mask('00000');
       
