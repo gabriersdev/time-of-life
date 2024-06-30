@@ -5,12 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tempo de Vida - Calculadora de Horas de Trabalho</title>
   <!-- Bootstrap CSS -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pretendard/1.3.9/static/pretendard.css" integrity="sha512-NzqTHTrO48HsIamogmIaVhTXoSgRF24Cn+ynrNYrFuKrY0AdDbmcNieiOHsQARS/r0Gax9VwV3/rVMHs3ipUlg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- Animate.css para animações -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <!-- Meta properties -->
+  <meta name="description" content="Calculadora de horas de trabalho necessárias para comprar um produto.">
+  <meta name="keywords" content="Calculadora, Horas de Trabalho, Salário, Produto, Compra, Tempo de Vida">
+  <meta name="author" content="Gabriel Mateus">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#FFF">
+  <meta name="msapplication-navbutton-color" content="#000000">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#000000">
+  <meta name="msapplication-TileColor" content="#000000">
+  <meta name="msapplication-TileImage" content="https://avatars.githubusercontent.com/u/105074547">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/105074547">
+
   <style>
+    *{
+      font-family: 'Pretendard', sans-serif;
+      font-size: 18px;
+    }
+    
     .result {
       display: none;
+    }
+    
+    .alert{
+      margin-bottom: 0;
     }
   </style>
 </head>
@@ -19,74 +44,124 @@
     <div class="row justify-content-center">
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header bg-primary text-white">
-            Tempo de Vida - Calculadora de Horas de Trabalho
+          <div class="card-header">
+            <b>Tempo de Vida - Calculadora de Horas de Trabalho</b>
           </div>
           <div class="card-body">
             <form id="calcForm">
               <div class="form-group mb-3">
                 <label for="salary">Salário Mensal (R$)</label>
-                <input type="text" class="form-control" id="salary" required inputmode="numeric">
+                <input type="text" class="form-control" id="salary" required inputmode="numeric" autofocus>
               </div>
               <div class="form-group mb-3">
                 <label for="hours">Horas Trabalhadas por Mês</label>
-                <input type="number" class="form-control" id="hours" required>
+                <input type="text" class="form-control" id="hours" required placeholder="Média horas dia * Qtde. dias">
               </div>
               <div class="form-group mb-3">
                 <label for="productPrice">Valor do Produto (R$)</label>
                 <input type="text" class="form-control" id="productPrice" required inputmode="numeric">
               </div>
               <button type="submit" class="btn btn-primary">Calcular</button>
+              <button type="reset" class="btn btn-secondary">Limpar</button>
             </form>
             <div class="result mt-4 alert alert-info animate__animated" id="result">
-              Você precisará trabalhar <span id="workHours"></span> horas, o que equivale a <span id="workDays"></span> dias, para adquirir este produto.
+              Você precisará trabalhar <span id="workHours"></span> horas, o que equivale a <span id="workDays"></span> dias <b>inteiros (de 24 horas)</b>, para adquirir este produto.
             </div>
           </div>
+        </div>
+        <div class="alert alert-primary mt-2">
+          <b>Observação:</b> Este cálculo é uma estimativa e não leva em consideração descontos, impostos e outros fatores que podem influenciar no resultado final. Os valores apresentados podem ser aproximados.
         </div>
       </div>
     </div>
   </div>
-
+  
   <!-- jQuery, Popper.js, Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <!-- jQuery Mask Plugin -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+  <!-- Load `toast` and `SvelteToast` into global scope  -->
+  <script src="https://cdn.jsdelivr.net/npm/@zerodevx/svelte-toast@0"></script>
   
   <script>
     $(document).ready(function(){
+      const toastApp = new SvelteToast({
+        target: document.body,
+      });
+      
+      toast.push(`Bem vindo!`);
+      
+      const toastAlert = (txt) => {
+        toast.push(txt, {
+          theme: {
+            '--toastColor': 'mintcream',
+            '--toastBackground': '#F54254',
+            '--toastBarBackground': '#BF3643'
+          }
+        });
+      }
+      
+      // Desativar o autocomplete dos campos
+      $('input').attr('autocomplete', 'off');
+      
       // Aplicar máscara monetária
       $('#salary, #productPrice').mask('000.000.000.000.000,00', {reverse: true});
+      $('#salary, #productPrice').attr('placeholder', 'R$ 0,00'); // Placeholder
 
+      // Aplicar máscara numérica
+      $('input#hours').mask('00000');
+      
+      // Função para converter valor monetário para float
       $('#calcForm').on('submit', function(event) {
         event.preventDefault();
-
+        
         // Função para converter valor monetário para float
         function toFloat(value) {
           return parseFloat(value.replace(/\./g, '').replace(',', '.'));
         }
-
+        
         // Obter os valores dos campos
-        const salary = toFloat($('#salary').val());
-        const hours = parseFloat($('#hours').val());
-        const productPrice = toFloat($('#productPrice').val());
-
+        try {
+          if ($('#salary').val().length === 0 || $('#hours').val().length === 0 || $('#productPrice').val().length === 0) throw new Error('Valores vazios!')
+          else if (parseFloat($('#salary').val()) === 0 || parseInt($('#hours').val()) === 0 || parseFloat($('#productPrice').val()) === 0) throw new Error('Zero!')
+          
+          
+          var salary = toFloat($('#salary').val());
+          var hours = parseInt($('#hours').val());
+          var productPrice = toFloat($('#productPrice').val());
+          
+          if (isNaN(salary) || isNaN(hours) || isNaN(productPrice)) throw new Error('Valores inválidos!');
+          
+        } catch (error) {
+          if (error.message === 'Valores inválidos') alert('Valores preenchidos não são válidos.')
+          else if (error.message === 'Valores vazios!') alert('Valores vazios! Um ou mais campos estão vazios.')
+          else if (error.message === 'Zero!') toastAlert('Valores zerados! Um ou mais campos estão zerados.')
+          else alert('Falha ao obter os valores dos campos. Recarregare a página!');
+          return;
+        }
+        
         // Calcular o valor da hora de trabalho
         const hourlyRate = salary / hours;
-
+        
         // Calcular quantas horas de trabalho são necessárias para comprar o produto
         const workHours = productPrice / hourlyRate;
-
+        
         // Calcular quantos dias de trabalho são necessários (considerando 24 horas por dia)
         const workDays = workHours / 24;
-
+        
         // Exibir o resultado
         $('#workHours').text(workHours.toFixed(2));
         $('#workDays').text(workDays.toFixed(2));
         $('#result').removeClass('animate__fadeOut').addClass('animate__fadeIn').show();
       });
+      
+      // Esconder o resultado ao digitar nos campos
+      $('input').on('input', () => {
+        $('#result').fadeOut(400);
+      })
     });
   </script>
 </body>
-</html>""
+</html>
