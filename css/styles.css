@@ -1,0 +1,12 @@
+*{
+  font-family: 'Pretendard', sans-serif;
+  font-size: 18px;
+}
+
+.result {
+  display: none;
+}
+
+.alert{
+  margin-bottom: 0;
+}
